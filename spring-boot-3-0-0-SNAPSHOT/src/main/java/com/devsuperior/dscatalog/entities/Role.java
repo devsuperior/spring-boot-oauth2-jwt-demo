@@ -2,7 +2,7 @@ package com.devsuperior.dscatalog.entities;
 
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "tb_role")

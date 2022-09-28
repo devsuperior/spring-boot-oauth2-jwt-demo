@@ -23,5 +23,5 @@ token:
 - Open Spring Boot project in your favorite IDE and run
 - Tests on Postman:
   - Request Hello endpoint (should return 401 Unauthorized)
-  - Request Login endpoing (should return 200 Ok with JWT token. That token will be saved on 'token' environment variable)
+  - Request Login endpoint (should return 200 Ok with JWT token. That token will be saved on 'token' environment variable)
   - Request Hello endpoint again (should return 200 Ok)

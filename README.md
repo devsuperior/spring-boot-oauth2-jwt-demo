@@ -3,12 +3,13 @@
 Our reference minimum implementations for using OAuth2 Authorization Server and Resource Server with Spring Boot
 
 ## Postman Collection:
-https://www.getpostman.com/collections/4d6be99fce598512a1bc
+https://api.postman.com/collections/1242165-56019d06-d619-417a-afca-c6a3c8ebf6ca?access_key=PMAT-01GTC31CZCV8YNG2XEAAY9VRE6
 
 ## Postman Environment:
 
 ```
-host: http://localhost:8080
+ashost: http://localhost:8081
+rshost: http://localhost:8081
 client-id: myclientid
 client-secret: myclientsecret
 username: maria@gmail.com

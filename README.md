@@ -9,7 +9,7 @@ https://api.postman.com/collections/1242165-56019d06-d619-417a-afca-c6a3c8ebf6ca
 
 ```
 ashost: http://localhost:8081
-rshost: http://localhost:8081
+rshost: http://localhost:8080
 client-id: myclientid
 client-secret: myclientsecret
 username: alex@gmail.com

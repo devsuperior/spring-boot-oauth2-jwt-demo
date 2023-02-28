@@ -1,4 +1,4 @@
-# Spring Boot OAuth2 JWT
+# Spring Boot OAuth2 JWT Demo
 
 Our reference minimum implementations for using OAuth2 Authorization Server and Resource Server with Spring Boot
 
@@ -12,7 +12,7 @@ ashost: http://localhost:8081
 rshost: http://localhost:8081
 client-id: myclientid
 client-secret: myclientsecret
-username: maria@gmail.com
+username: alex@gmail.com
 password: 123456
 token:
 ```
@@ -21,8 +21,22 @@ token:
 
 - Import Postman collection
 - Setup Postman environment
-- Open Spring Boot project in your favorite IDE and run
+- Open Spring Boot projects in your favorite IDE and run
 - Tests on Postman:
-  - Request Hello endpoint (should return 401 Unauthorized)
-  - Request Login endpoint (should return 200 Ok with JWT token. That token will be saved on 'token' environment variable)
-  - Request Hello endpoint again (should return 200 Ok)
+  - PART 1: not logged
+    - Request GET /products (should return products)
+    - Request GET /products/1 (should return 401)
+    - Request POST /products {"name":"Tablet"} (should return 401)
+  - PART 2: logged as Alex
+    - Set alex@gmail.com as username in Postman environment
+    - Request login request (should return 200 Ok with JWT token. That token will be saved on 'token' environment variable)
+    - Request GET /products (should return products)
+    - Request GET /products/1 (should return product)
+    - Request POST /products {"name":"Tablet"} (should return 403) 
+  - PART 3: logged as Maria
+    - Set maria@gmail.com as username in Postman environment
+    - Request login request (should return 200 Ok with JWT token. That token will be saved on 'token' environment variable)
+    - Request GET /products (should return products)
+    - Request GET /products/1 (should return product)
+    - Request POST /products {"name":"Tablet"} (should insert product) 
+

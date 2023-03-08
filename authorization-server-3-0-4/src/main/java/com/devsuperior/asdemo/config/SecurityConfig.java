@@ -13,7 +13,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -34,7 +34,6 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
-@SuppressWarnings("deprecation")
 @Configuration
 public class SecurityConfig {
 
@@ -69,17 +68,17 @@ public class SecurityConfig {
 				.build();
 		return new InMemoryUserDetailsManager(user1);
 	}
-
+	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return NoOpPasswordEncoder.getInstance();
+		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
 	public RegisteredClientRepository registeredClientRepository() {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("client")
-				.clientSecret("secret")
+				.clientSecret(passwordEncoder().encode("secret"))
 				.scope("read")
 				.redirectUri("https://oidcdebugger.com/debug")
 				.redirectUri("https://oauthdebugger.com/debug")

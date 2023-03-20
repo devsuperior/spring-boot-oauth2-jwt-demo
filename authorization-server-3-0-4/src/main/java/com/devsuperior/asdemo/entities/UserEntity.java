@@ -1,8 +1,10 @@
 package com.devsuperior.asdemo.entities;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
@@ -19,7 +21,7 @@ import jakarta.persistence.Table;
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "tb_user")
-public class User implements UserDetails {
+public class UserEntity implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,20 +29,20 @@ public class User implements UserDetails {
 	private String name;
 
 	@Column(unique = true)
-	private String email;
+	private String username;
 	private String password;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "tb_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<Role> authorities = new HashSet<>();
+	private Set<RoleEntity> authorities = new HashSet<>();
 
-	public User() {
+	public UserEntity() {
 	}
 
-	public User(Long id, String name, String email, String password) {
+	public UserEntity(Long id, String name, String username, String password) {
 		this.id = id;
 		this.name = name;
-		this.email = email;
+		this.username = username;
 		this.password = password;
 	}
 
@@ -60,33 +62,22 @@ public class User implements UserDetails {
 		this.name = name;
 	}
 
-	public String getEmail() {
-		return email;
+	@Override
+	public String getUsername() {
+		return username;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
+	@Override
 	public String getPassword() {
 		return password;
 	}
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public Set<Role> getAuthorities() {
-		return authorities;
-	}
-
-	public void setAuthorities(Set<Role> authorities) {
-		this.authorities = authorities;
-	}
-
-	@Override
-	public String getUsername() {
-		return email;
 	}
 
 	@Override
@@ -107,5 +98,10 @@ public class User implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return authorities;
 	}
 }

@@ -20,7 +20,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -51,22 +50,26 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Acce
 import org.springframework.security.oauth2.server.authorization.token.OAuth2RefreshTokenGenerator;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
+import com.devsuperior.asdemo.dto.CustomPasswordUser;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
-import com.devsuperior.asdemo.dto.CustomPasswordUser;
-
 @SuppressWarnings("deprecation")
 @Configuration
 public class SecurityConfig {
 
+	private final UserDetailsService userDetailsService;
+	
+	public SecurityConfig(UserDetailsService userDetailsService) {
+		this.userDetailsService = userDetailsService;
+	}
+	
 	@Bean
 	@Order(1)
 	public SecurityFilterChain asSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -77,7 +80,7 @@ public class SecurityConfig {
 				.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint
 					.accessTokenRequestConverter(new CustomPassordAuthenticationConverter())
-					.authenticationProvider(new CustomPassordAuthenticationProvider(authorizationService(), tokenGenerator(), userDetailsService()))
+					.authenticationProvider(new CustomPassordAuthenticationProvider(authorizationService(), tokenGenerator(), userDetailsService))
 					.accessTokenRequestConverters(getConverters())
 					.authenticationProviders(getProviders()))
 				.oidc(withDefaults())
@@ -100,7 +103,6 @@ public class SecurityConfig {
 	@Order(2)
 	public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
 		return http
-				.formLogin(withDefaults())
 				.authorizeHttpRequests(authorize ->authorize.anyRequest().authenticated())
 				.build();
 	}
@@ -113,15 +115,6 @@ public class SecurityConfig {
 	@Bean
 	public OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService() {
 		return new InMemoryOAuth2AuthorizationConsentService();
-	}
-	
-	@Bean
-	public UserDetailsService userDetailsService() {
-		var user1 = User.withUsername("user")
-				.password("password")
-				.authorities("read", "test")
-				.build();
-		return new InMemoryUserDetailsManager(user1);
 	}
 
 	@Bean

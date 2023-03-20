@@ -9,7 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -65,9 +65,9 @@ public class CustomPassordAuthenticationProvider implements AuthenticationProvid
 		RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
 		username = customPasswordAuthenticationToken.getUsername();
 		password = customPasswordAuthenticationToken.getPassword();	
-		User user = null;
+		UserDetails user = null;
 		try {
-			user = (User) userDetailsService.loadUserByUsername(username);
+			user = userDetailsService.loadUserByUsername(username);
 		} catch (UsernameNotFoundException e) {
 			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.ACCESS_DENIED);
 		}
@@ -158,6 +158,5 @@ public class CustomPassordAuthenticationProvider implements AuthenticationProvid
 			return clientPrincipal;
 		}
 		throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_CLIENT);
-	}
-	
+	}	
 }

@@ -5,13 +5,16 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
@@ -43,6 +46,10 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Acce
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.devsuperior.asdemo.config.customgrant.CustomPasswordAuthenticationConverter;
 import com.devsuperior.asdemo.config.customgrant.CustomPasswordAuthenticationProvider;
@@ -53,8 +60,11 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
 @Configuration
-public class AuthorizationServerConfig {
+public class SecurityConfig {
 
+	@Value("${cors.origins}")
+	private String corsOrigins;
+	
 	@Value("${security.client-id}")
 	private String clientId;
 	
@@ -62,7 +72,7 @@ public class AuthorizationServerConfig {
 	private String clientSecret;
 	
 	@Value("${security.jwt.duration}")
-	private Integer jwtDurationMillis;
+	private Integer jwtDurationSeconds;
 	
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -78,7 +88,7 @@ public class AuthorizationServerConfig {
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint
 					.accessTokenRequestConverter(new CustomPasswordAuthenticationConverter())
 					.authenticationProvider(new CustomPasswordAuthenticationProvider(authorizationService(), tokenGenerator(), userDetailsService, passwordEncoder())))
-				.and()
+				.and()				
 				.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
 				.build();
 	}
@@ -86,9 +96,9 @@ public class AuthorizationServerConfig {
 	@Bean
 	@Order(3)
 	public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
-		return http
-				.authorizeHttpRequests(authorize ->authorize.anyRequest().authenticated())
-				.build();
+		http.authorizeHttpRequests(authorize ->authorize.anyRequest().authenticated());			
+		http.cors().configurationSource(corsConfigurationSource());
+		return http.build();
 	}
 
 	@Bean
@@ -126,7 +136,7 @@ public class AuthorizationServerConfig {
 	public TokenSettings tokenSettings() {
 		return TokenSettings.builder()
 				.accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-				.accessTokenTimeToLive(Duration.ofMillis(jwtDurationMillis))
+				.accessTokenTimeToLive(Duration.ofSeconds(jwtDurationSeconds))
 				.build();
 	}
 	
@@ -168,6 +178,30 @@ public class AuthorizationServerConfig {
 		return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
 	}
 	
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+
+		String[] origins = corsOrigins.split(",");
+
+	    CorsConfiguration corsConfig = new CorsConfiguration();
+	    corsConfig.setAllowedOriginPatterns(Arrays.asList(origins));
+	    corsConfig.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "PATCH"));
+	    corsConfig.setAllowCredentials(true);
+	    corsConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+	 
+	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    source.registerCorsConfiguration("/**", corsConfig);
+	    return source;
+	}
+
+	@Bean
+	FilterRegistrationBean<CorsFilter> corsFilter() {
+	    FilterRegistrationBean<CorsFilter> bean
+	            = new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource()));
+	    bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+	    return bean;
+	}
+		
 	@Bean
 	public JWKSource<SecurityContext> jwkSource() {
 		RSAKey rsaKey = generateRsa();

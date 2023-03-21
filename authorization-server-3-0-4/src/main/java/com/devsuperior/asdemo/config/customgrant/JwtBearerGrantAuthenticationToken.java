@@ -1,4 +1,4 @@
-package com.devsuperior.asdemo.config;
+package com.devsuperior.asdemo.config.customgrant;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,6 +20,9 @@ public class JwtBearerGrantAuthenticationToken extends OAuth2AuthorizationGrantA
 	public JwtBearerGrantAuthenticationToken(String assertion, Authentication clientPrincipal,
 			@Nullable Set<String> scopes, @Nullable Map<String, Object> additionalParameters) {
 		super(AuthorizationGrantType.JWT_BEARER, clientPrincipal, additionalParameters);
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou16");
+		
 		Assert.hasText(assertion, "assertion cannot be empty");
 		this.assertion = assertion;
 		this.scopes = Collections.unmodifiableSet(

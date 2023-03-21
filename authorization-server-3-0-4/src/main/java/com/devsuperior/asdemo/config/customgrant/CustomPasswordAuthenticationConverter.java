@@ -1,4 +1,4 @@
-package com.devsuperior.asdemo.config;
+package com.devsuperior.asdemo.config.customgrant;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,15 +19,17 @@ import org.springframework.util.StringUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-public class CustomPassordAuthenticationConverter implements AuthenticationConverter {
+public class CustomPasswordAuthenticationConverter implements AuthenticationConverter {
 
 	@Nullable
 	@Override
 	public Authentication convert(HttpServletRequest request) {
 		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou01");
+		
 		String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
 				
-		if (!"custom_password".equals(grantType)) {
+		if (!"password".equals(grantType)) {
 			return null;
 		}
 		
@@ -73,6 +75,10 @@ public class CustomPassordAuthenticationConverter implements AuthenticationConve
 	}
 
 	private static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou02");
+
+		
 		Map<String, String[]> parameterMap = request.getParameterMap();
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>(parameterMap.size());
 		parameterMap.forEach((key, values) -> {

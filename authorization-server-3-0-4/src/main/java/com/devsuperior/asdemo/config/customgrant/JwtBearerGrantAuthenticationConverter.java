@@ -1,4 +1,4 @@
-package com.devsuperior.asdemo.config;
+package com.devsuperior.asdemo.config.customgrant;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +26,8 @@ public final class JwtBearerGrantAuthenticationConverter implements Authenticati
 	@Nullable
 	@Override
 	public Authentication convert(HttpServletRequest request) {
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou10");
 		
 		// grant_type (REQUIRED)
 		String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
@@ -71,6 +73,9 @@ public final class JwtBearerGrantAuthenticationConverter implements Authenticati
 	}
 
 	private static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou11");
+		
 		Map<String, String[]> parameterMap = request.getParameterMap();
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>(parameterMap.size());
 		parameterMap.forEach((key, values) -> {

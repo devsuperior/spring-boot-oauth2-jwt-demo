@@ -1,4 +1,4 @@
-package com.devsuperior.asdemo.config;
+package com.devsuperior.asdemo.config.customgrant;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,9 +19,14 @@ public class CustomPasswordAuthenticationToken extends OAuth2AuthorizationGrantA
 	
 	public CustomPasswordAuthenticationToken(Authentication clientPrincipal,
 			@Nullable Set<String> scopes, @Nullable Map<String, Object> additionalParameters) {
-		super(new AuthorizationGrantType("custom_password"), clientPrincipal, additionalParameters);
+		
+		super(new AuthorizationGrantType("password"), clientPrincipal, additionalParameters);
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou07");
+		
 		this.username = (String) additionalParameters.get("username");
 		this.password = (String) additionalParameters.get("password");
+
 		this.scopes = Collections.unmodifiableSet(
 				scopes != null ? new HashSet<>(scopes) : Collections.emptySet());
 	}

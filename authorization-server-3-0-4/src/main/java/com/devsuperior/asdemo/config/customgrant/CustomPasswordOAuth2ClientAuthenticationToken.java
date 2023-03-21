@@ -1,4 +1,4 @@
-package com.devsuperior.asdemo.config;
+package com.devsuperior.asdemo.config.customgrant;
 
 import java.util.Map;
 
@@ -14,10 +14,16 @@ public class CustomPasswordOAuth2ClientAuthenticationToken extends OAuth2ClientA
 			ClientAuthenticationMethod clientAuthenticationMethod, Object credentials,
 			Map<String, Object> additionalParameters) {
 		super(clientId, clientAuthenticationMethod, credentials, additionalParameters);
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou08");
+
 	}
 
 	public CustomPasswordOAuth2ClientAuthenticationToken(RegisteredClient registeredClient,
 			ClientAuthenticationMethod clientAuthenticationMethod, Object credentials) {
 		super(registeredClient, clientAuthenticationMethod, credentials);
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou09");
+
 	}
 }

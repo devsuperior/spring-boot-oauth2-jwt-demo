@@ -1,4 +1,4 @@
-package com.devsuperior.asdemo.config;
+package com.devsuperior.asdemo.config.customgrant;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -32,6 +32,9 @@ public final class JwtBearerGrantAuthenticationProvider implements Authenticatio
 
 	public JwtBearerGrantAuthenticationProvider(OAuth2AuthorizationService authorizationService,
 			OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator) {
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou12");
+		
 		Assert.notNull(authorizationService, "authorizationService cannot be null");
 		Assert.notNull(tokenGenerator, "tokenGenerator cannot be null");
 		this.authorizationService = authorizationService;
@@ -40,6 +43,8 @@ public final class JwtBearerGrantAuthenticationProvider implements Authenticatio
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou13");
 		
 		JwtBearerGrantAuthenticationToken jwtBearerGrantAuthentication = (JwtBearerGrantAuthenticationToken) authentication;
 		OAuth2ClientAuthenticationToken clientPrincipal = getAuthenticatedClientElseThrowInvalidClient(jwtBearerGrantAuthentication);
@@ -108,10 +113,16 @@ public final class JwtBearerGrantAuthenticationProvider implements Authenticatio
 
 	@Override
 	public boolean supports(Class<?> authentication) {
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou14");
+		
 		return JwtBearerGrantAuthenticationToken.class.isAssignableFrom(authentication);
 	}
 
 	private static OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(Authentication authentication) {
+		
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou15");
+		
 		OAuth2ClientAuthenticationToken clientPrincipal = null;
 		if (OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication.getPrincipal().getClass())) {
 			clientPrincipal = (OAuth2ClientAuthenticationToken) authentication.getPrincipal();

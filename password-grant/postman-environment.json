@@ -1,0 +1,51 @@
+{
+	"id": "29bb50c5-4314-4638-83f5-dfeca9b45035",
+	"name": "OAuth2 JWT password",
+	"values": [
+		{
+			"key": "ashost",
+			"value": "http://localhost:8081",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "rshost",
+			"value": "http://localhost:8080",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "client-id",
+			"value": "myclientid",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "client-secret",
+			"value": "myclientsecret",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "username",
+			"value": "alex@gmail.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "password",
+			"value": "123456",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2023-03-21T19:30:10.183Z",
+	"_postman_exported_using": "Postman/10.12.4"
+}

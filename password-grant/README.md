@@ -1,26 +1,13 @@
-# Spring Boot OAuth2 JWT Demo
+# Spring Boot OAuth2 JWT Demo (password grant type)
 
-Our reference minimum implementations for using OAuth2 Authorization Server and Resource Server with Spring Boot
+Our reference minimum implementations for using OAuth2 Authorization Server and Resource Server with Spring Boot, using password grant type, and user/roles from a database.
 
-## Postman Collection:
-https://api.postman.com/collections/1242165-56019d06-d619-417a-afca-c6a3c8ebf6ca?access_key=PMAT-01GTC31CZCV8YNG2XEAAY9VRE6
-
-## Postman Environment:
-
-```
-ashost: http://localhost:8081
-rshost: http://localhost:8080
-client-id: myclientid
-client-secret: myclientsecret
-username: alex@gmail.com
-password: 123456
-token:
-```
+## Postman Collection and Environment:
+Download them from this folder.
 
 ## How to run:
 
-- Import Postman collection
-- Setup Postman environment
+- Import Postman collection and environment
 - Open Spring Boot projects in your favorite IDE and run
 - Tests on Postman:
   - PART 1: not logged
@@ -39,4 +26,3 @@ token:
     - Request GET /products (should return products)
     - Request GET /products/1 (should return product)
     - Request POST /products {"name":"Tablet"} (should insert product) 
-

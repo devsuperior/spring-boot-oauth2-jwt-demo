@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.server.authorization.authentication.O
 public class CustomPasswordAuthenticationToken extends OAuth2AuthorizationGrantAuthenticationToken {
 
 	private static final long serialVersionUID = 1L;
+	
 	private final String username;
 	private final String password;
 	private final Set<String> scopes;
@@ -22,11 +23,8 @@ public class CustomPasswordAuthenticationToken extends OAuth2AuthorizationGrantA
 		
 		super(new AuthorizationGrantType("password"), clientPrincipal, additionalParameters);
 		
-		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou07");
-		
 		this.username = (String) additionalParameters.get("username");
 		this.password = (String) additionalParameters.get("password");
-
 		this.scopes = Collections.unmodifiableSet(
 				scopes != null ? new HashSet<>(scopes) : Collections.emptySet());
 	}

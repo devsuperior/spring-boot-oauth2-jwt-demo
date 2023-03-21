@@ -1,29 +1,25 @@
 package com.devsuperior.asdemo.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2Token;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationConsentService;
@@ -44,11 +40,9 @@ import org.springframework.security.oauth2.server.authorization.token.Delegating
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.JwtGenerator;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2AccessTokenGenerator;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2RefreshTokenGenerator;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import com.devsuperior.asdemo.config.customgrant.CustomPasswordAuthenticationConverter;
 import com.devsuperior.asdemo.config.customgrant.CustomPasswordAuthenticationProvider;
@@ -59,13 +53,19 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
 @Configuration
-public class SecurityConfig {
+public class AuthorizationServerConfig {
 
-	private final UserDetailsService userDetailsService;
+	@Value("${security.client-id}")
+	private String clientId;
 	
-	public SecurityConfig(UserDetailsService userDetailsService) {
-		this.userDetailsService = userDetailsService;
-	}
+	@Value("${security.client-secret}")
+	private String clientSecret;
+	
+	@Value("${security.jwt.duration}")
+	private Integer jwtDurationMillis;
+	
+	@Autowired
+	private UserDetailsService userDetailsService;
 	
 	@Bean
 	@Order(2)
@@ -78,10 +78,7 @@ public class SecurityConfig {
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint
 					.accessTokenRequestConverter(new CustomPasswordAuthenticationConverter())
 					.authenticationProvider(new CustomPasswordAuthenticationProvider(authorizationService(), tokenGenerator(), userDetailsService, passwordEncoder())))
-				.oidc(withDefaults())
 				.and()
-				.exceptionHandling(e -> e
-				.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
 				.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
 				.build();
 	}
@@ -111,22 +108,12 @@ public class SecurityConfig {
 
 	@Bean
 	public RegisteredClientRepository registeredClientRepository() {
-		RegisteredClient registeredClient = RegisteredClient.withId("client")
-				.clientId("client")
-				.clientSecret(passwordEncoder().encode("secret"))
+		RegisteredClient registeredClient = RegisteredClient
+				.withId(UUID.randomUUID().toString())
+				.clientId(clientId)
+				.clientSecret(passwordEncoder().encode(clientSecret))
 				.scope("read")
-				.scope(OidcScopes.OPENID)
-				.scope(OidcScopes.PROFILE)
-				.scope("message.read")
-				.scope("message.write")
-				.scope("read")
-				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/myoauth2")
-				.redirectUri("http://insomnia")
-				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-				.authorizationGrantType(AuthorizationGrantType.JWT_BEARER)
+				.scope("write")
 				.authorizationGrantType(new AuthorizationGrantType("password"))
 				.tokenSettings(tokenSettings())
 				.clientSettings(clientSettings())
@@ -139,7 +126,7 @@ public class SecurityConfig {
 	public TokenSettings tokenSettings() {
 		return TokenSettings.builder()
 				.accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-				.accessTokenTimeToLive(Duration.ofDays(1))
+				.accessTokenTimeToLive(Duration.ofMillis(jwtDurationMillis))
 				.build();
 	}
 	
@@ -159,9 +146,7 @@ public class SecurityConfig {
 		JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
 		jwtGenerator.setJwtCustomizer(tokenCustomizer());
 		OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
-		OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
-		return new DelegatingOAuth2TokenGenerator(
-				jwtGenerator, accessTokenGenerator, refreshTokenGenerator);
+		return new DelegatingOAuth2TokenGenerator(jwtGenerator, accessTokenGenerator);
 	}
 	
 	@Bean
@@ -169,12 +154,11 @@ public class SecurityConfig {
 		return context -> {
 			OAuth2ClientAuthenticationToken principal = context.getPrincipal();
 			CustomUserAuthorities user = (CustomUserAuthorities) principal.getDetails();
-			Set<String> authorities = user.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toSet());
+			List<String> authorities = user.getAuthorities().stream().map(x -> x.getAuthority()).toList();
 			if (context.getTokenType().getValue().equals("access_token")) {
-                context.getClaims().claim("authorities", authorities)
-                        .claim("user", user.getUsername());
+                context.getClaims()
+                	.claim("authorities", authorities)
+                    .claim("user", user.getUsername());
 			}
 		};
 	}

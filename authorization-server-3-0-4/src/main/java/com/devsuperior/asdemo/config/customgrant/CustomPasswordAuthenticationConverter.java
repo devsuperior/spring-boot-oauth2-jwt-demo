@@ -25,8 +25,6 @@ public class CustomPasswordAuthenticationConverter implements AuthenticationConv
 	@Override
 	public Authentication convert(HttpServletRequest request) {
 		
-		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou01");
-		
 		String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
 				
 		if (!"password".equals(grantType)) {
@@ -75,9 +73,6 @@ public class CustomPasswordAuthenticationConverter implements AuthenticationConv
 	}
 
 	private static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
-		
-		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou02");
-
 		
 		Map<String, String[]> parameterMap = request.getParameterMap();
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>(parameterMap.size());

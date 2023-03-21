@@ -15,12 +15,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClaimAccessor;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
-import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
@@ -49,8 +47,6 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 			OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator, 
 			UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
 		
-		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou03");
-		
 		Assert.notNull(authorizationService, "authorizationService cannot be null");
 		Assert.notNull(tokenGenerator, "TokenGenerator cannot be null");
 		Assert.notNull(userDetailsService, "UserDetailsService cannot be null");
@@ -63,8 +59,6 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 	
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		
-		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou04");
 		
 		CustomPasswordAuthenticationToken customPasswordAuthenticationToken = (CustomPasswordAuthenticationToken) authentication;
 		OAuth2ClientAuthenticationToken clientPrincipal = getAuthenticatedClientElseThrowInvalidClient(customPasswordAuthenticationToken);
@@ -130,41 +124,19 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 		} else {
 			authorizationBuilder.accessToken(accessToken);
 		}
-		
-		//-----------REFRESH TOKEN----------
-		OAuth2RefreshToken refreshToken = null;
-		if (registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.REFRESH_TOKEN) &&
-				!clientPrincipal.getClientAuthenticationMethod().equals(ClientAuthenticationMethod.NONE)) {
-
-			tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.REFRESH_TOKEN).build();
-			OAuth2Token generatedRefreshToken = this.tokenGenerator.generate(tokenContext);
-			if (!(generatedRefreshToken instanceof OAuth2RefreshToken)) {
-				OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-						"The token generator failed to generate the refresh token.", ERROR_URI);
-				throw new OAuth2AuthenticationException(error);
-			}
-			refreshToken = (OAuth2RefreshToken) generatedRefreshToken;
-			authorizationBuilder.refreshToken(refreshToken);
-		}
 				
 		OAuth2Authorization authorization = authorizationBuilder.build();
 		this.authorizationService.save(authorization);
 		
-		return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken, refreshToken);
+		return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken);
 	}
 
 	@Override
 	public boolean supports(Class<?> authentication) {
-		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou05");
-//		boolean result = CustomPasswordAuthenticationToken.class.isAssignableFrom(authentication);
-//		System.out.println("RESULT = " + result);
 		return CustomPasswordAuthenticationToken.class.isAssignableFrom(authentication);
-//		return true;
 	}
 
 	private static OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(Authentication authentication) {
-		
-		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX passou06");
 		
 		OAuth2ClientAuthenticationToken clientPrincipal = null;
 		if (OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication.getPrincipal().getClass())) {

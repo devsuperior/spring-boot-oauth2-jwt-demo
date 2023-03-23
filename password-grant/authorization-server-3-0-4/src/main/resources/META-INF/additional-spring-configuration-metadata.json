@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "cors.origins",
+    "type": "java.lang.String",
+    "description": "A description for 'cors.origins'"
+  },
+  {
+    "name": "security.client-id",
+    "type": "java.lang.String",
+    "description": "A description for 'security.client-id'"
+  },
+  {
+    "name": "security.jwt.duration",
+    "type": "java.lang.String",
+    "description": "A description for 'security.jwt.duration'"
+  },
+  {
+    "name": "security.client-secret",
+    "type": "java.lang.String",
+    "description": "A description for 'security.client-secret'"
+  }
+]}

@@ -22,56 +22,54 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityConfig {
+public class ResourceServerConfig {
 
 	@Value("${cors.origins}")
 	private String corsOrigins;
-	
+
 	@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
 	String issuerUri;
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-			.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-			.oauth2ResourceServer(oauth2 -> oauth2
-					.jwt(jwt -> jwt.decoder(JwtDecoders.fromIssuerLocation(issuerUri))));
+		http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+		http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(JwtDecoders.fromIssuerLocation(issuerUri))));
 		http.cors().configurationSource(corsConfigurationSource());
 		return http.build();
 	}
-	
+
 	@Bean
 	public JwtAuthenticationConverter jwtAuthenticationConverter() {
-	    JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-	    grantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
-	    grantedAuthoritiesConverter.setAuthorityPrefix("");
+		JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+		grantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
+		grantedAuthoritiesConverter.setAuthorityPrefix("");
 
-	    JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-	    jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-	    return jwtAuthenticationConverter;
+		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+		return jwtAuthenticationConverter;
 	}
-	
+
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 
 		String[] origins = corsOrigins.split(",");
 
-	    CorsConfiguration corsConfig = new CorsConfiguration();
-	    corsConfig.setAllowedOriginPatterns(Arrays.asList(origins));
-	    corsConfig.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "PATCH"));
-	    corsConfig.setAllowCredentials(true);
-	    corsConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-	 
-	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    source.registerCorsConfiguration("/**", corsConfig);
-	    return source;
+		CorsConfiguration corsConfig = new CorsConfiguration();
+		corsConfig.setAllowedOriginPatterns(Arrays.asList(origins));
+		corsConfig.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "PATCH"));
+		corsConfig.setAllowCredentials(true);
+		corsConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", corsConfig);
+		return source;
 	}
 
 	@Bean
 	FilterRegistrationBean<CorsFilter> corsFilter() {
-	    FilterRegistrationBean<CorsFilter> bean
-	            = new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource()));
-	    bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-	    return bean;
+		FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(
+				new CorsFilter(corsConfigurationSource()));
+		bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		return bean;
 	}
 }

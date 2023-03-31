@@ -7,7 +7,7 @@ Download them from this folder.
 
 ## How to run:
 
-- Import Postman collection and environment
+- Import Postman collection and environment (note: . Ajust it on you request if needed.)
 - Open Spring Boot projects in your favorite IDE and run
 - Tests on Postman:
   - PART 1: not logged
@@ -17,6 +17,8 @@ Download them from this folder.
   - PART 2: logged as Alex
     - Set alex@gmail.com as username in Postman environment
     - Request login request (should return 200 Ok with JWT token. That token will be saved on 'token' environment variable)
+      - Note: the Login request may be `/oauth2/token` or `/oauth/token` depending on Spring Boot version. Change request path if needed.
+      - Note: the Login host may be `/localhost:8080` if you're running a project that contains both Authorization Server and Resource Server. Change the `ashost` variable to `/localhost:8080` on yout Postman enrironment if needed.
     - Request GET /products (should return products)
     - Request GET /products/1 (should return product)
     - Request POST /products {"name":"Tablet"} (should return 403) 

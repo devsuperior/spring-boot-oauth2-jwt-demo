@@ -69,11 +69,9 @@ public class AuthorizationServerConfig {
 
 	@Bean
 	@Order(2)
-	public SecurityFilterChain asSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+	public SecurityFilterChain asSecurityFilterChain(HttpSecurity http) throws Exception {
 
-		HttpSecurity http = httpSecurity.securityMatcher("/**");
-
-		http.with(OAuth2AuthorizationServerConfigurer.authorizationServer(), Customizer.withDefaults());
+		http.securityMatcher("/**").with(OAuth2AuthorizationServerConfigurer.authorizationServer(), Customizer.withDefaults());
 
 		// @formatter:off
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)

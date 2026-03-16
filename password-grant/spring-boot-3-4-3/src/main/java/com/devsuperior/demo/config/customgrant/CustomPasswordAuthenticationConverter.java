@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -20,6 +20,9 @@ import org.springframework.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class CustomPasswordAuthenticationConverter implements AuthenticationConverter {
+
+	private static final String USERNAME = "username";
+	private static final String PASSWORD = "password";
 
 	@Nullable
 	@Override
@@ -41,16 +44,16 @@ public class CustomPasswordAuthenticationConverter implements AuthenticationConv
 		}
 		
 		// username (REQUIRED)
-		String username = parameters.getFirst(OAuth2ParameterNames.USERNAME);
+		String username = parameters.getFirst(USERNAME);
 		if (!StringUtils.hasText(username) ||
-				parameters.get(OAuth2ParameterNames.USERNAME).size() != 1) {
+				parameters.get(USERNAME).size() != 1) {
 			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
 		}
 		
 		// password (REQUIRED)
-		String password = parameters.getFirst(OAuth2ParameterNames.PASSWORD);
+		String password = parameters.getFirst(PASSWORD);
 		if (!StringUtils.hasText(password) ||
-				parameters.get(OAuth2ParameterNames.PASSWORD).size() != 1) {
+				parameters.get(PASSWORD).size() != 1) {
 			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
 		}
 				
@@ -64,8 +67,8 @@ public class CustomPasswordAuthenticationConverter implements AuthenticationConv
 		parameters.forEach((key, value) -> {
 			if (!key.equals(OAuth2ParameterNames.GRANT_TYPE) &&
 					!key.equals(OAuth2ParameterNames.SCOPE) &&
-					!key.equals(OAuth2ParameterNames.USERNAME) &&
-					!key.equals(OAuth2ParameterNames.PASSWORD)) {
+					!key.equals(USERNAME) &&
+					!key.equals(PASSWORD)) {
 				additionalParameters.put(key, value.get(0));
 			}
 		});

@@ -63,13 +63,15 @@ public class CustomPasswordAuthenticationConverter implements AuthenticationConv
 		Map<String, Object> additionalParameters = new HashMap<>();
 		parameters.forEach((key, value) -> {
 			if (!key.equals(OAuth2ParameterNames.GRANT_TYPE) &&
-					!key.equals(OAuth2ParameterNames.SCOPE)) {
+					!key.equals(OAuth2ParameterNames.SCOPE) &&
+					!key.equals(OAuth2ParameterNames.USERNAME) &&
+					!key.equals(OAuth2ParameterNames.PASSWORD)) {
 				additionalParameters.put(key, value.get(0));
 			}
 		});
 		
 		Authentication clientPrincipal = SecurityContextHolder.getContext().getAuthentication();	
-		return new CustomPasswordAuthenticationToken(clientPrincipal, requestedScopes, additionalParameters);
+		return new CustomPasswordAuthenticationToken(clientPrincipal, requestedScopes, additionalParameters, username, password);
 	}
 
 	private static MultiValueMap<String, String> getParameters(HttpServletRequest request) {

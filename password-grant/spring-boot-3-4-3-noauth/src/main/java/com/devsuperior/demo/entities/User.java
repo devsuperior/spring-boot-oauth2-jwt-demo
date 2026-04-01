@@ -1,13 +1,17 @@
 package com.devsuperior.demo.entities;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,6 +26,12 @@ public class User {
     @Column(unique = true)
     private String email;
     private String password;
+
+    @ManyToMany
+    @JoinTable(name = "tb_user_role",
+            joinColumns = @jakarta.persistence.JoinColumn(name = "user_id"),
+            inverseJoinColumns = @jakarta.persistence.JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
     }
@@ -63,6 +73,19 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void addRole(Role role) {
+        roles.add(role);
+    }
+
+    public boolean hasRole(String roleName) {
+        for (Role role : roles) {
+            if (role.getAuthority().equals(roleName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
